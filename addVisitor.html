@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Visitor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        body {
+            background-image: url('./image/background.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            color: #fff;
+        }
+        nav {
+            width: 80px;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            height: 100%;
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        nav ul li {
+            font-size: 16px;
+        }
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease-in-out;
+        }
+        nav ul li a:hover {
+            color:  #e50914;
+        }
+        .Log-out {
+            margin-top: auto;
+            font-size: 16px;
+            cursor: pointer;
+            color: #fff;
+            background-color: transparent;
+            border: none;
+        }
+        form {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 300px;
+            margin-left: 20px;
+        }
+        input {
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav>
+    <ul>
+        <li><a href="homepage.html">Home</a></li>
+        <li><a href="search.html">Search</a></li>
+        <li><a href="addVisitor.html">Add</a></li>
+    </ul>
+    <button class="Log-out" onclick="logout()">Log-out</button>
+</nav>
+
+<!-- Add Visitor Form -->
+<form onsubmit="addVisitor(event)">
+    <h1>Add New Visitor</h1>
+    <input type="text" id="name" placeholder="Visitor Name" required>
+    <input type="text" id="id" placeholder="Visitor ID" required>
+    <input type="date" id="date" lang="en" required>
+    <input type="time" id="time" required>
+    <button type="submit">Add Visitor</button>
+</form>
+
+<script>
+    function addVisitor(event) {
+        event.preventDefault();
+        
+        // Gather input values
+        const name = document.getElementById('name').value;
+        const id = document.getElementById('id').value;
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('time').value;
+        
+        const newVisitor = { name, id, date, time };
+
+        // Fetch existing visitors or initialize if not present
+        const visitors = JSON.parse(localStorage.getItem('visitors')) || { today: [], upcoming: [], previous: [] };
+        
+        // Get today's date for comparison, and normalize time zones
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Reset time for accurate comparison
+
+        const visitDate = new Date(date);
+        visitDate.setHours(0, 0, 0, 0); // Reset time for accurate comparison
+
+        // Compare the visitor's date with the current date
+        if (visitDate.getTime() === currentDate.getTime()) {
+            // If the date is today, add to 'today' visitors
+            visitors.today.push(newVisitor);
+        } else if (visitDate > currentDate) {
+            // If the visit is in the future, add to 'upcoming' visitors
+            visitors.upcoming.push(newVisitor);
+        } else {
+            // If the visit is in the past, add to 'previous' visitors
+            visitors.previous.push(newVisitor);
+        }
+        // Save the updated visitors list to localStorage
+        localStorage.setItem('visitors', JSON.stringify(visitors));
+
+        // Redirect to the homepage without showing an alert
+        window.location.href = 'homepage.html';
+    }
+
+    function logout() {
+        window.location.href = 'index.html';
+    }
+</script>
+</body>
+</html>
